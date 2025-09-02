@@ -102,20 +102,15 @@ class Pokedex(commands.Cog):
             )
 
             embed.add_field(
-                name="Tipos",
+                name="Tipos:",
                 value=types_str,
                 inline=True
             )
             embed.add_field(
-                name="Altura",
-                value=f"{height}m",
+                name="Caracteristicas:",
+                value=f"Altura: **{height}m**\nPeso: **{weight}kg**",
                 inline=True
             )
-            embed.add_field(
-                name="Peso",
-                value=f"{weight}kg",
-                inline=True
-                )
             embed.add_field(
                 name="Debilidades",
                 value=weaknesses_str,
