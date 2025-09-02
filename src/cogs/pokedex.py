@@ -10,21 +10,15 @@ URL = "https://pokeapi.co/api/v2/pokemon/"
 SPECIES_URL = "https://pokeapi.co/api/v2/pokemon-species/"
 TYPE_URL = "https://pokeapi.co/api/v2/type/"
 
-colores_pokemon = {
-    "red": 0xFF0000,
-    "blue": 0x0000FF,
-    "green": 0x00FF00,
-    "yellow": 0xFFFF00,
-    "black": 0x000000,
-    "brown": 0x8B4513,
-    "purple": 0x800080,
-    "pink": 0xFFC0CB,
-    "gray": 0x808080,
-    "white": 0xFFFFFF
-}
 
 with open(PATH_JSON + "/types_emojis.json", "r", encoding="utf-8") as f:
     types_emojis = json.load(f)
+
+with open(PATH_JSON + "/color_pokemon.json", "r", encoding="utf-8") as f:
+    colores_pokemon = json.load(f)
+
+with open(PATH_JSON + "/generations.json", "r", encoding="utf-8") as f:
+    generations = json.load(f)
 
 class Pokedex(commands.Cog):
     def __init__(self, bot):
@@ -34,7 +28,7 @@ class Pokedex(commands.Cog):
         name="pokedex",
         description="Escribe el nombre o numero de un pokemon"
     )
-    async def pokedex(self, interaction: discord.interactions, *, name: str):
+    async def pokedex(self, interaction: discord.Interaction, *, name: str):
         response = requests.get(URL + name.lower())
         if response.status_code == 200:
             data = response.json()
@@ -61,12 +55,13 @@ class Pokedex(commands.Cog):
                         descripcion = entry["flavor_text"].replace("\n", " ").replace("\f", " ")
                         break
             color_embed = colores_pokemon.get(color.lower(), 0xFF0000)
+            gen_data = generations.get(region, {"name": "Desconocida", "region": "Desconocida"})
 
             # Datos básicos
             name_poke = data["name"].capitalize()
             poke_id = data["id"]
             types = [t["type"]["name"] for t in data["types"]]
-            types_str = ", ".join([f"{types_emojis.get(t, '')} {t.capitalize()}" for t in types])
+            types_str = "\n".join([f"{types_emojis.get(t, '')} {t.capitalize()}" for t in types])
             weight = data["weight"]
             height = data["height"]
             imagen = data["sprites"]["front_default"]
@@ -79,19 +74,19 @@ class Pokedex(commands.Cog):
                     type_data = type_response.json()
                     for weakness in type_data["damage_relations"]["double_damage_from"]:
                         weaknesses.add(weakness["name"])
-            weaknesses_str = ", ".join([f"{types_emojis.get(w, '')} {w.capitalize()}" for w in weaknesses]) if weaknesses else "Ninguna"
+            weaknesses_str = "-".join([f"{types_emojis.get(w, '')} {w.capitalize()}" for w in weaknesses]) if weaknesses else "Ninguna"
 
             # Embed de Discord
             embed = discord.Embed(
                 title="{} (#{:04})".format(name_poke, poke_id),
-                description=f"{descripcion}\n\nGeneracion: **{region.capitalize()}**",
-                color=color_embed
+                description=f"{descripcion}\n\nGeneracion: **{gen_data["name"].capitalize()}**\nRegion: **{gen_data["region"].capitalize()}**",
+                color=int(color_embed, 16)
             )
 
             embed.add_field(name="Tipos", value=types_str, inline=True)
             embed.add_field(name="Altura", value=f"{height}m", inline=True)
             embed.add_field(name="Peso", value=f"{weight}kg", inline=True)
-            embed.add_field(name="weaknesses", value=weaknesses_str, inline=False)
+            embed.add_field(name="Debilidades", value=weaknesses_str, inline=False)
             embed.set_thumbnail(url=imagen)
             embed.set_footer(text="Datos obtenidos de la PokeAPI")
 

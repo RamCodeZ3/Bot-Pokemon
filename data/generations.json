@@ -1,0 +1,38 @@
+{
+  "generation-i": {
+    "name": "Primera Generación",
+    "region": "Kanto"
+  },
+  "generation-ii": {
+    "name": "Segunda Generación",
+    "region": "Johto"
+  },
+  "generation-iii": {
+    "name": "Tercera Generación",
+    "region": "Hoenn"
+  },
+  "generation-iv": {
+    "name": "Cuarta Generación",
+    "region": "Sinnoh"
+  },
+  "generation-v": {
+    "name": "Quinta Generación",
+    "region": "Unova"
+  },
+  "generation-vi": {
+    "name": "Sexta Generación",
+    "region": "Kalos"
+  },
+  "generation-vii": {
+    "name": "Séptima Generación",
+    "region": "Alola"
+  },
+  "generation-viii": {
+    "name": "Octava Generación",
+    "region": "Galar"
+  },
+  "generation-ix": {
+    "name": "Novena Generación",
+    "region": "Paldea"
+  }
+}

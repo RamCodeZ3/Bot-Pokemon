@@ -1,0 +1,12 @@
+{
+    "red": "0xFF0000",
+    "blue": "0x0000FF",
+    "green": "0x00FF00",
+    "yellow": "0xFFFF00",
+    "black": "0x000000",
+    "brown": "0x8B4513",
+    "purple": "0x800080",
+    "pink": "0xFFC0CB",
+    "gray": "0x808080",
+    "white": "0xFFFFFF"
+}
