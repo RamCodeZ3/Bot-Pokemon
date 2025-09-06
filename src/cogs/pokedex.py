@@ -88,7 +88,7 @@ class Pokedex(commands.Cog):
                     type = type_data["damage_relations"]["double_damage_from"]
                     for weakness in type:
                         weaknesses.add(weakness["name"])
-            weaknesses_str = "-".join(
+            weaknesses_str = " | ".join(
                 [
                     f"{types_emojis.get(w, '')} {w.capitalize()}" 
                     for w in weaknesses
@@ -108,7 +108,7 @@ class Pokedex(commands.Cog):
             )
             embed.add_field(
                 name="Caracteristicas:",
-                value=f"Altura: **{height}m**\nPeso: **{weight}kg**",
+                value=f"Altura: **{height / 10:.1f}m**\nPeso: **{weight / 10:.1f}kg**",
                 inline=True
             )
             embed.add_field(
