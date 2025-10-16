@@ -6,9 +6,13 @@ import random
 
 URL = "https://pokeapi.co/api/v2/pokemon/"
 
+
 class Game(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.pokemon = None
+        self.image = None
+        self.opportunities = 3
 
     @app_commands.command(
         name="play",
@@ -19,7 +23,7 @@ class Game(commands.Cog):
 
         if response.status_code == 200:
             data = response.json()
-            correct_name = data["name"]
+            self.pokemon = data["name"]
             weight = data["weight"]
             height = data["height"]
             types = [t["type"]["name"] for t in data["types"]]
@@ -27,7 +31,7 @@ class Game(commands.Cog):
             games = [g["version"]["name"] for g in data["game_indices"]]
             species_url = data["species"]["url"]
             species_data = requests.get(species_url).json()
-            imagen = data["sprites"]["front_default"]
+            self.image = data["sprites"]["front_default"]
             generation = species_data["generation"]["name"]
 
             gen_url = species_data["generation"]["url"]
@@ -48,14 +52,13 @@ class Game(commands.Cog):
                 description="Tienes 3 intentos para adivinar el Pokémon",
                 color=0x800080
             )
-            embed.add_field(name="pokemon:", value=f"{correct_name}", inline=False)
+            embed.add_field(name="pokemon:", value=f"{self.pokemon}", inline=False)
             embed.add_field(name="Pista 1:", value=pokemon_info["weight"], inline=False)
             embed.add_field(name="Pista 2:", value=pokemon_info["height"], inline=False)
             embed.add_field(name="Pista 3:", value=pokemon_info["types"], inline=False)
             embed.set_footer(text="Datos obtenidos de la PokeAPI")
 
             await interaction.response.send_message(embed=embed)
-            return [correct_name, imagen]
         else:
             await interaction.response.send_message("No se pudo obtener información del Pokémon.")
     
@@ -64,18 +67,29 @@ class Game(commands.Cog):
         description='Responde con el nombre del pokemon'
     )
     async def answer(self, interaction: discord.Interaction, *, name: str):
-        data = Game.play() 
-        if name == data[0]:
+        if name == self.pokemon and self.opportunities != 0:
             embed = discord.Embed(
                 title="Correcto el pokemon era: {}".format(name),
                 description="Ere todo un maestro pokemon",
                 color=0x800080
             )
-            embed.set_image(data[1])
+            embed.set_image(url=self.image)
             embed.set_footer(text="Datos obtenidos de la PokeAPI")
             await interaction.response.send_message(embed=embed)
+        
+        elif self.opportunities == 0:
+            embed = discord.Embed(
+                title="El pokemon correcto era: {}".format(self.pokemon),
+                description="Talvez a la proxima lo adivine",
+                color=0x800080
+            )
+            embed.set_image(url=self.image)
+            embed.set_footer(text="Datos obtenidos de la PokeAPI")
+            await interaction.response.send_message(embed=embed)
+        
         else:
-            await interaction.response.send_message("Lo siento pero no es l pokemon correcto.")
+            await interaction.response.send_message("Lo siento pero no es el pokemon correcto. te quedan {} oportunidades".format(self.opportunities))
+            self.opportunities -= 1
 
 
 async def setup(bot):
