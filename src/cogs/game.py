@@ -3,15 +3,23 @@ from discord.ext import commands
 from discord import app_commands
 import requests
 import random
+import asyncio
+import os
+
 
 URL = "https://pokeapi.co/api/v2/pokemon/"
+IMG = os.path.abspath("image/pokeball.png")
 
+async def timer():
+    await asyncio.sleep(5)
+    return False
 
 class Game(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.pokemon = None
         self.image = None
+        self.time = timer()
         self.opportunities = 3
 
     @app_commands.command(
@@ -38,14 +46,14 @@ class Game(commands.Cog):
             gen_data = requests.get(gen_url).json()
             region = gen_data["main_region"]["name"]
 
-            pokemon_info = {
-                "weight": f"El pokemon pesa {weight}kg",
-                "height": f"El pokemon mide {height}m de alto",
-                "types": f"Es tipo: {', '.join(types)}",
-                "games": f"Aparece en estos juegos: {', '.join(games[:5])}",
-                "region": f"Su región es {region}",
-                "ability": f"Tiene estas habilidades: {', '.join(ability)}"
-            }
+            pokemon_info = [
+                f"El pokemon pesa {weight}kg",
+                f"El pokemon mide {height}m de alto",
+                f"Es tipo: {', '.join(types)}",
+                f"Aparece en estos juegos: {', '.join(games[:5])}",
+                f"Su región es {region}",
+                f"Tiene estas habilidades: {', '.join(ability)}"
+            ]
 
             embed = discord.Embed(
                 title="Adivina el Pokémon",
@@ -53,21 +61,23 @@ class Game(commands.Cog):
                 color=0x800080
             )
             embed.add_field(name="pokemon:", value=f"{self.pokemon}", inline=False)
-            embed.add_field(name="Pista 1:", value=pokemon_info["weight"], inline=False)
-            embed.add_field(name="Pista 2:", value=pokemon_info["height"], inline=False)
-            embed.add_field(name="Pista 3:", value=pokemon_info["types"], inline=False)
+            embed.add_field(name="Pista 1:", value=pokemon_info[random.randint(0, 1)], inline=False)
+            embed.add_field(name="Pista 2:", value=pokemon_info[random.randint(2, 3)], inline=False)
+            embed.add_field(name="Pista 3:", value=pokemon_info[random.randint(4, 5)], inline=False)
+            file = discord.File(IMG, filename="pokeball.png")
+            embed.set_thumbnail(url="attachment://pokeball.png")
             embed.set_footer(text="Datos obtenidos de la PokeAPI")
 
-            await interaction.response.send_message(embed=embed)
+            await interaction.response.send_message(embed=embed, file=file)
         else:
             await interaction.response.send_message("No se pudo obtener información del Pokémon.")
-    
+
     @app_commands.command(
         name='answer',
         description='Responde con el nombre del pokemon'
     )
     async def answer(self, interaction: discord.Interaction, *, name: str):
-        if name == self.pokemon and self.opportunities != 0:
+        if name == self.pokemon and self.opportunities != 0 and self.time:
             embed = discord.Embed(
                 title="Correcto el pokemon era: {}".format(name),
                 description="Ere todo un maestro pokemon",
@@ -90,7 +100,6 @@ class Game(commands.Cog):
         else:
             await interaction.response.send_message("Lo siento pero no es el pokemon correcto. te quedan {} oportunidades".format(self.opportunities))
             self.opportunities -= 1
-
 
 async def setup(bot):
     await bot.add_cog(Game(bot))
