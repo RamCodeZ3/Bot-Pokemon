@@ -21,6 +21,7 @@ with open(PATH_JSON + "/color_pokemon.json", "r", encoding="utf-8") as f:
 with open(PATH_JSON + "/generations.json", "r", encoding="utf-8") as f:
     generations = json.load(f)
 
+
 class Pokedex(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -106,16 +107,19 @@ class Pokedex(commands.Cog):
                 value=types_str,
                 inline=True
             )
+            
             embed.add_field(
                 name="Caracteristicas:",
                 value=f"Altura: **{height / 10:.1f}m**\nPeso: **{weight / 10:.1f}kg**",
                 inline=True
             )
+            
             embed.add_field(
                 name="Debilidades",
                 value=weaknesses_str,
                 inline=False
             )  
+            
             embed.set_thumbnail(url=imagen)
             embed.set_footer(text="Datos obtenidos de la PokeAPI")
 
@@ -123,6 +127,7 @@ class Pokedex(commands.Cog):
 
         else: 
             await interaction.channel.send("No se encontro el pokemon")
+
 
 async def setup(bot):
     await bot.add_cog(Pokedex(bot))

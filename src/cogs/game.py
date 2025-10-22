@@ -47,8 +47,8 @@ class Game(commands.Cog):
             region = gen_data["main_region"]["name"]
 
             pokemon_info = [
-                f"El pokemon pesa {weight}kg",
-                f"El pokemon mide {height}m de alto",
+                f"El pokemon pesa {weight / 10:.1f}kg",
+                f"El pokemon mide {height / 10:.1f}m de alto",
                 f"Es tipo: {', '.join(types)}",
                 f"Aparece en estos juegos: {', '.join(games[:5])}",
                 f"Su región es {region}",
@@ -60,10 +60,30 @@ class Game(commands.Cog):
                 description="Tienes 3 intentos para adivinar el Pokémon",
                 color=0x800080
             )
-            embed.add_field(name="pokemon:", value=f"{self.pokemon}", inline=False)
-            embed.add_field(name="Pista 1:", value=pokemon_info[random.randint(0, 1)], inline=False)
-            embed.add_field(name="Pista 2:", value=pokemon_info[random.randint(2, 3)], inline=False)
-            embed.add_field(name="Pista 3:", value=pokemon_info[random.randint(4, 5)], inline=False)
+            
+            embed.add_field(
+                name="pokemon:",
+                value=f"{self.pokemon}",
+                inline=False)
+            
+            embed.add_field(
+                name="Pista 1:",
+                value=pokemon_info[random.randint(0, 1)],
+                inline=False
+            )
+            
+            embed.add_field(
+                name="Pista 2:",
+                value=pokemon_info[random.randint(2, 3)],
+                inline=False
+            )
+            
+            embed.add_field(
+                name="Pista 3:",
+                value=pokemon_info[random.randint(4, 5)],
+                inline=False
+            )
+            
             file = discord.File(IMG, filename="pokeball.png")
             embed.set_thumbnail(url="attachment://pokeball.png")
             embed.set_footer(text="Datos obtenidos de la PokeAPI")
@@ -83,7 +103,7 @@ class Game(commands.Cog):
                 description="Ere todo un maestro pokemon",
                 color=0x800080
             )
-            embed.set_image(url=self.image)
+            embed.set_thumbnail(url=self.image)
             embed.set_footer(text="Datos obtenidos de la PokeAPI")
             await interaction.response.send_message(embed=embed)
         
@@ -98,7 +118,10 @@ class Game(commands.Cog):
             await interaction.response.send_message(embed=embed)
         
         else:
-            await interaction.response.send_message("Lo siento pero no es el pokemon correcto. te quedan {} oportunidades".format(self.opportunities))
+            await interaction.response.send_message(
+                "Lo siento pero no es el pokemon correcto. te quedan {} oportunidades"
+                .format(self.opportunities)
+            )
             self.opportunities -= 1
 
 async def setup(bot):
