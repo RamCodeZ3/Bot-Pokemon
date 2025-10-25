@@ -84,7 +84,8 @@ class Game(commands.Cog):
             embed.add_field(
                 name="pokemon:",
                 value=f"{self.pokemon}",
-                inline=False)
+                inline=False
+            )
             
             for i, hint in enumerate(random.sample(pokemon_info, 3), start=1):
                 embed.add_field(name=f"Pista {i}:", value=hint, inline=False)
@@ -103,7 +104,7 @@ class Game(commands.Cog):
         description='Responde con el nombre del pokemon'
     )
     async def answer(self, interaction: discord.Interaction, *, name: str):
-        if name == self.pokemon and self.opportunities != 0 and self.time:
+        if name == self.pokemon and self.opportunities != 0 and self.game_active:
             embed = discord.Embed(
                 title="Correcto el pokemon era: {}".format(name),
                 description="Ere todo un maestro pokemon",
@@ -111,6 +112,7 @@ class Game(commands.Cog):
             )
             embed.set_thumbnail(url=self.image)
             embed.set_footer(text="Datos obtenidos de la PokeAPI")
+            self.game_active = False
             await interaction.response.send_message(embed=embed)
         
         elif self.opportunities == 0:
@@ -119,10 +121,13 @@ class Game(commands.Cog):
                 description="Talvez a la proxima lo adivine",
                 color=0x800080
             )
-            embed.set_image(url=self.image)
+            embed.set_thumbnail(url=self.image)
             embed.set_footer(text="Datos obtenidos de la PokeAPI")
+            self.game_active = False
             await interaction.response.send_message(embed=embed)
         
+        if self.game_active != True: await interaction.response.send_message('No hay pokemon para adivinar')
+
         else:
             await interaction.response.send_message(
                 "Lo siento pero no es el pokemon correcto. te quedan {} oportunidades"
